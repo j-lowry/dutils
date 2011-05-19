@@ -1,0 +1,20 @@
+useradd options:
+-c --comment
+-b --base-dir
+-d --home
+-e --expiredate
+-f --inactive
+-g --gid
+-G --groups
+-h --help
+-M
+-m --create-home
+-l
+-n 
+-K --key
+-o --non-unique
+-p --password
+-r
+-s shell
+-u --uid
+-Z --selinux-user
