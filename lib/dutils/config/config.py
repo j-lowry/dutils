@@ -1,4 +1,6 @@
 import re
+import ConfigParser
+
 
 myconfig = {}
 defFile = '/etc/login.defs'
