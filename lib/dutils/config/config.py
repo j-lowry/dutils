@@ -1,6 +1,18 @@
 import re
 import ConfigParser
+import os
 
+config = ConfigParser.ConfigParser()
+try:
+    config.readfp(open(os.path.expanduser('~/.dutils/conf')))
+except IOError:
+###Create the file, close it, then read it###
+    print "Creating config file."
+    f = open(os.path.expanduser('~/.dutils/conf'),'w')
+    f.close()
+    config.readfp(open(os.path.expanduser('~/.dutils/conf')))
+except ConfigParser.MissingSectionHeaderError:
+    print "Error in conf file. Missing section header."
 
 myconfig = {}
 defFile = '/etc/login.defs'
