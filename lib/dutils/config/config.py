@@ -1,6 +1,4 @@
-import re
-import ConfigParser
-import os
+import re,ConfigParser, ldap, os
 
 config = ConfigParser.ConfigParser()
 try:
@@ -13,6 +11,31 @@ except IOError:
     config.readfp(open(os.path.expanduser('~/.dutils/conf')))
 except ConfigParser.MissingSectionHeaderError:
     print "Error in conf file. Missing section header."
+
+
+def set_URI():
+    try:
+    ###Get the first section in the conf file###
+        uri = config.get('default', 'uri')
+    except AttributeError:
+        uri = ldap.OPT_URI 
+    return uri
+
+def set_BASE():
+    try:
+        base = config.get('default', 'base')
+        return base
+    except:
+        print "Error: base is not configured."
+        exit(1)
+        
+def set_BINDDN():
+    try:
+        binddn = config.get('default', 'binddn')
+        return binddn
+    except:
+        print "Error: binddn is not configured."
+        exit(1)
 
 myconfig = {}
 defFile = '/etc/login.defs'

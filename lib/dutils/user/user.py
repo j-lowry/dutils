@@ -7,4 +7,6 @@ class User:
 
     def __init__(self):
 
+def getNextUID:
+
 __version__ = '0.01'
