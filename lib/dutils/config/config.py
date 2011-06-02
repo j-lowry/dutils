@@ -12,7 +12,6 @@ except IOError:
 except ConfigParser.MissingSectionHeaderError:
     print "Error in conf file. Missing section header."
 
-
 def set_URI():
     try:
     ###Get the first section in the conf file###
@@ -36,6 +35,23 @@ def set_BINDDN():
     except:
         print "Error: binddn is not configured."
         exit(1)
+
+def set_BINDPW():
+    if config.get('default', 'SASL_MECH') != 'gssapi':
+        try:
+            bindpw = config.get('default', 'bindpw')
+            return bindpw
+        except ConfigParser.NoOptionError:
+            print "Error: bindpw is not configured."
+            exit(1)
+
+def set_NETWORK_TIMEOUT():
+    try:
+        network_timeout = config.get('default', 'network_timeout')
+    except ConfigParser.NoOptionError:
+        network_timeout = ldap.OPT_NETWORK_TIMEOUT
+    return network_timeout
+
 
 myconfig = {}
 defFile = '/etc/login.defs'
