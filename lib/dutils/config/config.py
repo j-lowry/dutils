@@ -1,4 +1,4 @@
-import re,ConfigParser, ldap, os
+import re, ConfigParser, ldap, os
 
 config = ConfigParser.ConfigParser()
 try:
@@ -27,6 +27,24 @@ def set_BASE():
     except:
         print "Error: base is not configured."
         exit(1)
+
+def set_USERDN():
+    try:
+        userdn = config.get('default', 'userdn')
+        userdn = userdn + ',' + set_BASE()
+        return userdn
+    except:
+        print "Error: userdn is not configured"
+        exit(1)
+
+def set_GROUPDN():
+    try:
+        groupdn = config.get('default', 'groupdn')
+        groupdn = groupdn + ',' + set_BASE()
+        return groupdn
+    except:
+        print "Error: groupdn is not configured"
+        exit(1)
         
 def set_BINDDN():
     try:
@@ -45,13 +63,63 @@ def set_BINDPW():
             print "Error: bindpw is not configured."
             exit(1)
 
-def set_NETWORK_TIMEOUT():
+def set_USERFILTER():
     try:
-        network_timeout = config.get('default', 'network_timeout')
-    except ConfigParser.NoOptionError:
-        network_timeout = ldap.OPT_NETWORK_TIMEOUT
-    return network_timeout
+        userfilter = config.get('default', 'userfilter')
+    except:
+        ldapFilter = 'ojectClass=*'
+    return userfilter 
 
+def set_GROUPFILTER():
+    try:
+        groupfilter = config.get('default', 'groupfilter')
+    except:
+        ldapFilter = 'ojectClass=*'
+    return groupfilter
+
+def set_FILTER(dntype):
+    if dntype == 'group':
+        ldapFilter = set_GROUPFILTER()
+    elif dntype == 'user':
+        ldapFilter = set_USERFILTER()
+    return ldapFilter
+    
+class Directory:
+
+    def __init__(self):
+        self.l = ldap.initialize(set_URI())
+
+    def SIMPLE_BIND(self):
+        try:    
+            self.l.simple_bind_s(set_BINDDN(), set_BINDPW())
+        except ldap.SERVER_DOWN, errMsg:
+            print errMsg[0]['desc']
+        except ldap.UNWILLING_TO_PERFORM, errMsg:
+            print errMsg[0]['desc']
+        except ldap.INVALID_CREDENTIALS, errMsg:
+            print errMsg[0]['desc']
+
+    def get_NXT_ID_NUM(self, dntype):
+        if dntype == 'group':
+            ldapAttr = 'gidNumber'
+        elif dntype == 'user':
+            ldapAttr = 'uidNumber'
+
+        idList = []
+        ids = self.l.search_s(set_BASE(), ldap.SCOPE_SUBTREE, set_FILTER(dntype), [ldapAttr])
+        for id in ids:
+            idList.append(int(id[1][ldapAttr][0])) 
+        return int(max(idList)) + 1
+
+def get_D_UID_MAX():
+    try:
+        d_uid_max = config.get('default', 'uid_max')
+    except:
+        d_uid_max = 60000
+    return d_uid_max
+
+def get_D_NXT_ID_NUM():
+    pass
 
 myconfig = {}
 defFile = '/etc/login.defs'
@@ -63,8 +131,10 @@ for line in f:
         myline = str.split(line)
         myconfig[myline[0]] = myline[1]
 
-def getMaxUID():
+def get_L_MaxUID():
     return myconfig['UID_MAX']
+
+
 
 def getMailDIR():
     return myconfig['MAIL_DIR']
