@@ -109,17 +109,53 @@ class Directory:
         ids = self.l.search_s(set_BASE(), ldap.SCOPE_SUBTREE, set_FILTER(dntype), [ldapAttr])
         for id in ids:
             idList.append(int(id[1][ldapAttr][0])) 
-        return int(max(idList)) + 1
+
+        
+        
+        #return int(max(idList)) + 1
+
+def get_UID_MAX():
+    return get_D_UID_MAX()
+
+def get_UID_MIN():
+    pass
+    
+def get_GID_MAX():
+    pass
+
+def get_GID_MIN():
+    pass
 
 def get_D_UID_MAX():
     try:
         d_uid_max = config.get('default', 'uid_max')
     except:
         d_uid_max = 60000
-    return d_uid_max
+    return int(d_uid_max)
 
-def get_D_NXT_ID_NUM():
-    pass
+def get_D_UID_MIN():
+    try:
+        d_uid_min = config.get('default', 'uid_min')
+    except:
+        d_uid_min = 10000
+#Need to find a better solution. Not sure what to go with here. 
+#9999 sounds like plenty of room for local accounts, but I dunno
+    return int(d_uid_min)
+
+def get_D_GID_MAX():
+    try:
+        d_gid_max = config.get('default', 'gid_max')
+    except:
+        d_gid_max = 60000
+    return d_gid_max
+
+def get_D_GID_MIN():
+    try:
+        d_gid_min = config.get('default', 'gid_min')
+    except:
+        d_gid_min = 10000
+    return d_gid_min
+
 
 myconfig = {}
 defFile = '/etc/login.defs'
@@ -131,10 +167,11 @@ for line in f:
         myline = str.split(line)
         myconfig[myline[0]] = myline[1]
 
-def get_L_MaxUID():
-    return myconfig['UID_MAX']
+def get_L_UID_MAX():
+    return int(myconfig['UID_MAX'])
 
-
+def get_L_UID_MIN():
+    return int(myconfig['UID_MIN'])
 
 def getMailDIR():
     return myconfig['MAIL_DIR']
@@ -281,7 +318,7 @@ def getFAKE_SHELL():
 
     return myconfig['FAKE_SHELL']
 
-def getGID_MAX():
+def get_L_GID_MAX():
     """Returns Int. Max of group IDs used for the creation of regular groups\
 ."""
 
@@ -292,7 +329,7 @@ def getGID_MAX():
 
     return int(myconfig['GID_MAX'])
 
-def getGID_MIN():
+def get_L_GID_MIN():
     """Returns Int. Min of group IDs used for the creation of regular groups\
 ."""
 
@@ -316,3 +353,9 @@ def getHUSHLOGIN_FILE():
         myconfig['HUSHLOGIN_FILE'] = ''
 
     return myconfig['HUSHLOGIN_FILE']
+
+def test_ID_RANGE():
+    if get_D_UID_MIN() <= get_L_UID_MAX() & get_D_UID_MAX() >= get_L_UID_MIN():
+        print "Warning. Overlap of IDs possible on this local system." 
+
+test_ID_RANGE()
