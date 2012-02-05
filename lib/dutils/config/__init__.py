@@ -2,15 +2,14 @@ import re, ConfigParser, ldap, os
 
 config = ConfigParser.ConfigParser()
 try:
-    config.readfp(open(os.path.expanduser('~/.dutils/conf')))
+    config.readfp(open(os.path.expanduser('~/.dutilsrc')))
 except IOError:
 ###Create the file, close it, then read it###
     #print "Creating config file."
-    d = os.mkdir(os.path.expanduser('~/.dutils/'), 0600)
-    d.close()
-    f = open(os.path.expanduser('~/.dutils/conf'),'w')
-    f.close()
-    config.readfp(open(os.path.expanduser('~/.dutils/conf')))
+    #d = os.mkdir(os.path.expanduser('~/.dutils/'), 0600)
+    f = open(os.path.expanduser('~/.dutilsrc'),'w')
+    #f.close()
+    config.readfp(open(os.path.expanduser('~/.dutilsrc')))
 except ConfigParser.MissingSectionHeaderError:
     print "Error in conf file. Missing section header."
 
