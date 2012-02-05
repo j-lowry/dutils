@@ -1,5 +1,5 @@
 """ dutils Framework
-A framework fro creating, managing, and deleting users and groups in a LDAP
+A framework for creating, managing, and deleting users and groups in a LDAP
 directory for Unix-like systems.
 
 Subclasses:
